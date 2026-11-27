@@ -1,7 +1,4 @@
 __pycache__/
-*.py[cod]
-.pytest_cache/
-.env
-.local/
-.devcontainer/agent.env
-.devcontainer/.env
+*.pyc
+.bak*
+.DS_Store
