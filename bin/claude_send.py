@@ -11,8 +11,9 @@ import sys
 import time
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
-CLAUDE_EXE = "/mnt/c/Users/user/.local/bin/claude.exe"
-CLAUDE_CWD = "/mnt/c/Users/user/AppData/Local/Temp"
+_WIN_USER = os.environ.get("OPS_CONSOLE_WIN_HOME", "/mnt/c/Users/user")
+CLAUDE_EXE = os.environ.get("OPS_CONSOLE_CLAUDE_EXE", f"{_WIN_USER}/.local/bin/claude.exe")
+CLAUDE_CWD = os.environ.get("OPS_CONSOLE_CLAUDE_CWD", f"{_WIN_USER}/AppData/Local/Temp")
 
 
 def build_prompt(target: str, letter: str) -> str:

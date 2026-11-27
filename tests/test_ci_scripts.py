@@ -10,7 +10,7 @@ import sys
 import tempfile
 import unittest
 
-ROOT = pathlib.Path(__file__).resolve().parent
+ROOT = pathlib.Path(__file__).resolve().parents[1]
 RUN_TESTS = ROOT / "scripts" / "ci" / "run-tests.py"
 CHECK_LEGS = ROOT / "scripts" / "ci" / "check-test-legs.py"
 WORKFLOW = ROOT / ".github" / "workflows" / "ci.yml"
@@ -46,7 +46,7 @@ class TestRunTestsScript(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             _write_file(
                 tmp,
-                "test_alpha.py",
+                "tests/test_alpha.py",
                 "import unittest\n"
                 "class T(unittest.TestCase):\n"
                 "    def test_one(self): self.assertEqual(1, 1)\n"
@@ -55,7 +55,7 @@ class TestRunTestsScript(unittest.TestCase):
             )
             _write_file(
                 tmp,
-                "test_beta.py",
+                "tests/test_beta.py",
                 "import unittest\n"
                 "class T(unittest.TestCase):\n"
                 "    def test_two(self): self.assertTrue(True)\n",
@@ -63,7 +63,7 @@ class TestRunTestsScript(unittest.TestCase):
             _write_file(tmp, "helper.py", "raise RuntimeError('should not be imported')\n")
             _write_file(
                 tmp,
-                "sub/test_nested.py",
+                "tests/sub/test_nested.py",
                 "import unittest\n"
                 "class T(unittest.TestCase):\n"
                 "    def test_nested(self): self.fail('should not run')\n",
@@ -77,9 +77,9 @@ class TestRunTestsScript(unittest.TestCase):
             self.assertEqual(data.get("leg"), "all")
             files = data.get("files", [])
             by_name = {entry["file"]: entry for entry in files}
-            self.assertEqual(set(by_name.keys()), {"test_alpha.py", "test_beta.py"})
+            self.assertEqual(set(by_name.keys()), {"tests/test_alpha.py", "tests/test_beta.py"})
 
-            alpha = by_name["test_alpha.py"]
+            alpha = by_name["tests/test_alpha.py"]
             self.assertEqual(alpha["tests"], 2)
             self.assertEqual(alpha["failures"], 0)
             self.assertEqual(alpha["errors"], 0)
@@ -87,7 +87,7 @@ class TestRunTestsScript(unittest.TestCase):
             self.assertIsInstance(alpha["duration_s"], (int, float))
             self.assertGreaterEqual(alpha["duration_s"], 0)
 
-            beta = by_name["test_beta.py"]
+            beta = by_name["tests/test_beta.py"]
             self.assertEqual(beta["tests"], 1)
             self.assertEqual(beta["failures"], 0)
             self.assertEqual(beta["errors"], 0)
@@ -97,14 +97,14 @@ class TestRunTestsScript(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             _write_file(
                 tmp,
-                "test_ok.py",
+                "tests/test_ok.py",
                 "import unittest\n"
                 "class T(unittest.TestCase):\n"
                 "    def test_ok(self): pass\n",
             )
             _write_file(
                 tmp,
-                "test_fail.py",
+                "tests/test_fail.py",
                 "import unittest\n"
                 "class T(unittest.TestCase):\n"
                 "    def test_fail(self): self.fail('boom')\n",
@@ -115,13 +115,13 @@ class TestRunTestsScript(unittest.TestCase):
             if report_path.is_file():
                 data = json.loads(report_path.read_text(encoding="utf-8"))
                 by_name = {e["file"]: e for e in data.get("files", [])}
-                self.assertEqual(by_name["test_fail.py"]["failures"], 1)
+                self.assertEqual(by_name["tests/test_fail.py"]["failures"], 1)
 
     def test_exits_nonzero_on_test_error(self):
         with tempfile.TemporaryDirectory() as tmp:
             _write_file(
                 tmp,
-                "test_err.py",
+                "tests/test_err.py",
                 "import unittest\n"
                 "class T(unittest.TestCase):\n"
                 "    def test_err(self): raise RuntimeError('boom')\n",
@@ -255,7 +255,7 @@ class TestCiWorkflow(unittest.TestCase):
         self.assertIn("actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0", text)
         self.assertRegex(text, r"node-version:\s*['\"]?22['\"]?")
         self.assertIn("python3 scripts/ci/run-tests.py --report test-report.json", text)
-        self.assertIn("git ls-files -- 'test_*.py' | python3 scripts/ci/check-test-legs.py test-report.json", text)
+        self.assertIn("git ls-files -- 'tests/test_*.py' | python3 scripts/ci/check-test-legs.py test-report.json", text)
 
 
 if __name__ == "__main__":

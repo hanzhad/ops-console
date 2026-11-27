@@ -37,8 +37,8 @@ DEV_CONTAINER_STATE = pathlib.Path(os.environ.get("DEV_CONTAINER_HOME", HOME / "
 
 # Claude Paths
 CLAUDE_CANDIDATES = [
-    pathlib.Path("/mnt/c/Users/user/AppData/Local/Claude-Data"),
-    pathlib.Path("/mnt/c/Users/user/AppData/Local/Packages"),
+    pathlib.Path(os.environ.get("OPS_CONSOLE_WIN_HOME", "/mnt/c/Users/user")) / "AppData/Local/Claude-Data",
+    pathlib.Path(os.environ.get("OPS_CONSOLE_WIN_HOME", "/mnt/c/Users/user")) / "AppData/Local/Packages",
 ]
 
 

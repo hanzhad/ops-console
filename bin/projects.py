@@ -1,15 +1,17 @@
+import os
 #!/usr/bin/env python3
 """The projects with dev-container slots on this machine, read off the machine.
 
-Discovers projects connected to dev-container-engine via ~/.dev-containers/projects/*.json
+Discovers projects connected to agent-dev-slots via ~/.dev-containers/projects/*.json
 and project.env files.
 """
 import json, os, pathlib, re, subprocess, sys
 
 HOME = pathlib.Path.home()
 STATE = pathlib.Path(os.environ.get("DEV_CONTAINER_HOME", HOME / ".dev-containers"))
-THIN_ENGINE = HOME / "Projects/host_repo/tools/dev-container-engine/scripts/dev-container-thin"
-ENGINE_BIN = HOME / "Projects/host_repo/tools/dev-container-engine/bin/dev-container"
+_ENG_DIR = pathlib.Path(os.environ.get("OPS_CONSOLE_ENGINE_DIR", HOME / "Projects/agent-dev-slots"))
+THIN_ENGINE = pathlib.Path(os.environ.get("OPS_CONSOLE_ENGINE_THIN", _ENG_DIR / "scripts/dev-container-thin"))
+ENGINE_BIN = pathlib.Path(os.environ.get("OPS_CONSOLE_ENGINE_BIN", _ENG_DIR / "bin/dev-container"))
 _NEW_SLOT_RE = re.compile(r"^0-slot-(\d+)-(.+)$")
 _LEGACY_SLOT_RE = re.compile(r"^(.+)-slot-(\d+)$")
 _BUNDLE_TS_RE = re.compile(r"^(.+)-(\d{8}-\d{6})(?:-\d+)?$")

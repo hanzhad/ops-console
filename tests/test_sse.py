@@ -362,7 +362,7 @@ class TestUiOnTheServer(ServerCase):
 
 
 class TestStoreStructure(unittest.TestCase):
-    STORE_JS = (pathlib.Path(__file__).resolve().parent / "static" / "store.js").read_text(encoding="utf-8")
+    STORE_JS = (pathlib.Path(__file__).resolve().parents[1] / "static" / "store.js").read_text(encoding="utf-8")
 
     def test_command_sends_ui(self):
         m = re.search(r"JSON\.stringify\(.*\bui\b", self.STORE_JS)
@@ -382,7 +382,7 @@ class TestStoreStructure(unittest.TestCase):
 
 class TestPageStoreReconcile(unittest.TestCase):
     def test_store_js_drops_pending_ids_not_running_in_the_snapshot(self):
-        src = (pathlib.Path(__file__).resolve().parent / "static" / "store.js").read_text(encoding="utf-8")
+        src = (pathlib.Path(__file__).resolve().parents[1] / "static" / "store.js").read_text(encoding="utf-8")
         self.assertIn("function reconcilePending", src)
         ready = [ln for ln in src.splitlines() if "on(es, 'ready'" in ln]
         self.assertEqual(len(ready), 1)
@@ -391,7 +391,7 @@ class TestPageStoreReconcile(unittest.TestCase):
 
 class TestCiQueueRepoName(unittest.TestCase):
     def calls(self, repos):
-        bin_dir = str(pathlib.Path(__file__).resolve().parent / "bin")
+        bin_dir = str(pathlib.Path(__file__).resolve().parents[1] / "bin")
         if bin_dir not in sys.path:
             sys.path.insert(0, bin_dir)
         import ci
@@ -413,7 +413,7 @@ class TestCiQueueRepoName(unittest.TestCase):
 
 class TestEscSingleQuote(unittest.TestCase):
     def esc(self, s):
-        src = (pathlib.Path(__file__).resolve().parent / "static" / "util.js").read_text(encoding="utf-8")
+        src = (pathlib.Path(__file__).resolve().parents[1] / "static" / "util.js").read_text(encoding="utf-8")
         js = "const esc=new Function(process.argv[1]+';return esc;')();process.stdout.write(esc(process.argv[2]))"
         p = subprocess.run(["node", "-e", js, src, s], capture_output=True, text=True, timeout=20)
         self.assertEqual(p.returncode, 0, p.stderr)

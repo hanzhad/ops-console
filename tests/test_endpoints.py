@@ -24,7 +24,7 @@ import unittest
 from unittest.mock import MagicMock, patch
 
 # Ensure sw-178 root and bin/ are on sys.path
-SW_ROOT = pathlib.Path(__file__).resolve().parent
+SW_ROOT = pathlib.Path(__file__).resolve().parents[1]
 BIN_DIR = SW_ROOT / "bin"
 for p in (str(SW_ROOT), str(BIN_DIR)):
     if p not in sys.path:

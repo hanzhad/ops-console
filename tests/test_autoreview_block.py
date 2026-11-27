@@ -19,7 +19,7 @@ import sys
 import unittest
 from unittest.mock import patch
 
-ROOT = pathlib.Path(__file__).resolve().parent
+ROOT = pathlib.Path(__file__).resolve().parents[1]
 BIN = ROOT / "bin"
 
 SAMPLE_ARGS = [["start"], ["stop"], ["restart"], ["sync-tokens"], ["pause"], ["resume"],

@@ -2,6 +2,7 @@
 """Built-in probe: Claude Code (AppData/.../claude-code-sessions/*/*/local_*.json)."""
 
 import json
+import os
 import pathlib
 import time
 from typing import Any, Dict, List, Optional
@@ -9,7 +10,8 @@ from typing import Any, Dict, List, Optional
 import claude_registry
 import winproc
 
-REGISTRY_DIR = "/mnt/c/Users/user/.claude/sessions"
+_WIN_USER = os.environ.get("OPS_CONSOLE_WIN_HOME", "/mnt/c/Users/user")
+REGISTRY_DIR = os.environ.get("OPS_CONSOLE_CLAUDE_SESSIONS", f"{_WIN_USER}/.claude/sessions")
 
 
 def _probe_claude() -> List[Dict[str, Any]]:
@@ -17,7 +19,7 @@ def _probe_claude() -> List[Dict[str, Any]]:
     session_files: List[pathlib.Path] = []
 
     # 1. AppData/Local/Claude-Data/claude_*/claude-code-sessions/*/*/local_*.json
-    c_data = pathlib.Path("/mnt/c/Users/user/AppData/Local/Claude-Data")
+    c_data = pathlib.Path(_WIN_USER) / "AppData/Local/Claude-Data"
     if c_data.exists():
         for cdir in c_data.glob("claude_*/claude-code-sessions"):
             try:
@@ -27,7 +29,7 @@ def _probe_claude() -> List[Dict[str, Any]]:
                 pass
 
     # 2. Packages/Claude_*/LocalCache/Roaming/Claude/claude-code-sessions/*/*/local_*.json
-    pkg_data = pathlib.Path("/mnt/c/Users/user/AppData/Local/Packages")
+    pkg_data = pathlib.Path(_WIN_USER) / "AppData/Local/Packages"
     if pkg_data.exists():
         for pdir in pkg_data.glob("Claude_*/LocalCache/Roaming/Claude/claude-code-sessions"):
             try:

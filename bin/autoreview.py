@@ -1,3 +1,4 @@
+import os
 #!/usr/bin/env python3
 """Auto-review container service management for ops-console.
 
@@ -7,12 +8,12 @@ set-global harness/model, pause/resume repo, set repo all/self_review, trigger t
 import json, os, pathlib, re, shlex, subprocess, sys
 
 HOME = pathlib.Path.home()
-HOST_REPO = HOME / "Projects" / "host_repo"
+HOST_REPO = pathlib.Path(os.environ.get("OPS_CONSOLE_AUTOREVIEW_REPO", HOME / "Projects" / "pr-auto-review"))
 COMPOSE = HOST_REPO / "tools" / "auto-review" / "docker-compose.yml"
 HOST_TOKEN_DIR = pathlib.Path(f"/run/user/{os.getuid()}/auto-review")
 
 
-# Since host_repo#280 the auto-review container starts as root without
+# The auto-review container starts as root without
 # DAC_OVERRIDE and the gate (uid 10001) owns /run/auto-review and
 # /var/lib/auto-review 0700: a root `docker exec` can read neither.
 GATE_UID = os.environ.get("AUTO_REVIEW_GATE_UID", "10001")
@@ -101,7 +102,7 @@ def get_models():
 
 
 def get_health_status():
-    """Query `auto-review status --json` for token problems and harness faults (host_repo#284)."""
+    """Query `auto-review status --json` for token problems and harness faults."""
     rc, out, err = cli("status", "--json", timeout=10)
     if rc != 0:
         return {"tokens": [], "harnesses": {}, "error": err or out or "auto-review status --json failed"}
@@ -130,7 +131,7 @@ def get_global(raw=None):
 
 def set_global(key, val):
     if key == "harness":
-        # One write: the CLI sets the harness together with its default model (host_repo#283).
+        # One write: the CLI sets the harness together with its default model.
         return cli_result(["set-global", "harness", val], f"global harness={val}")
     elif key == "model":
         model = str(val).strip()
@@ -139,7 +140,7 @@ def set_global(key, val):
 
 
 def is_paused(entry):
-    # `paused` is the key since host_repo#285; a registry from before the migration carries `enabled: false`.
+    # `paused` is the key in current registries; a registry from before the migration carries `enabled: false`.
     if "paused" in entry:
         return bool(entry["paused"])
     return entry.get("enabled", True) is False
@@ -260,7 +261,7 @@ def set_repo(repo, key, val):
 
 
 def adopt_repo(repo, all_prs=False, self_review=False):
-    # Model, harness and interval are the machine's, not the repository's (host_repo#285).
+    # Model, harness and interval are the machine's, not the repository's.
     args = ["adopt", repo]
     if all_prs:
         args.append("--all")

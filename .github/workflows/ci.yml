@@ -27,7 +27,7 @@ jobs:
         run: python3 scripts/ci/run-tests.py --report test-report.json
       - name: Check test legs
         if: always()
-        run: git ls-files -- 'test_*.py' | python3 scripts/ci/check-test-legs.py test-report.json
+        run: git ls-files -- 'tests/test_*.py' | python3 scripts/ci/check-test-legs.py test-report.json
       - name: Run repository smoke tests
         run: python3 -m unittest discover -s tests -v
 
