@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""The CI half of the ops-console pane, through host_repo's ci-runner.sh (the design docs).
+"""The CI half of the ops-console pane, through ci-runner ci-runner.sh.
 
   ci.py status                   JSON: gate state, live budget, repository switches
   ci.py pause | resume | reset
@@ -9,15 +9,16 @@
 
 sw/domains/ci.py imports gate_status() and queue(); nothing is cached here.
 """
-import json, pathlib, re, shlex, subprocess, sys
+import json, os, pathlib, re, shlex, subprocess, sys
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 from sw import core  # noqa: E402
 
 HOME = pathlib.Path.home()
-CI_TOOLS = HOME / "Projects/host_repo/tools/ci-runner/ci-runner.sh"
-CI = CI_TOOLS if CI_TOOLS.exists() else (HOME / "Projects/host_repo/ci-runner/ci-runner.sh")
-SKIP = {"hanzhad/demo-app-ai-extension"}  # dropped from cross-project work
+_CI_ENV = os.environ.get("OPS_CONSOLE_CI_RUNNER")
+CI_TOOLS = pathlib.Path(_CI_ENV) if _CI_ENV else (HOME / "Projects/ci-runner/ci-runner.sh")
+CI = CI_TOOLS if CI_TOOLS.exists() else (HOME / "Projects/ci-runner/ci-runner.sh")
+SKIP = {s.strip() for s in os.environ.get("OPS_CONSOLE_CI_SKIP", "").split(",") if s.strip()}
 
 
 def run(*args, timeout=60):

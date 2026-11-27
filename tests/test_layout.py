@@ -13,7 +13,8 @@ import sys
 import tempfile
 import unittest
 
-ROOT = pathlib.Path(__file__).resolve().parent
+ROOT = pathlib.Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path: sys.path.insert(0, str(ROOT))
 FROZEN = {"bin/engine.py": 631}  # existing files over the limit: a ratchet
 DOMAINS = ["ci", "autoreview", "slots", "sessions", "cleaners", "host", "runners", "messaging"]
 STATIC = ["util", "store", "app", "topbar", "slots", "sessions", "cleaners", "ci", "autoreview", "log"]

@@ -3,6 +3,7 @@
 immutable URI + annotations/*.pbtxt + presence/*.lock)."""
 
 import json
+import os
 import pathlib
 import re
 import shutil
@@ -13,7 +14,7 @@ from datetime import datetime
 from typing import Any, Dict, List
 
 # Antigravity Paths (WSL /mnt/c)
-AGY_BASE = pathlib.Path("/mnt/c/Users/user/.gemini/antigravity")
+AGY_BASE = pathlib.Path(os.environ.get("OPS_CONSOLE_AGY_BASE", os.environ.get("OPS_CONSOLE_WIN_HOME", "/mnt/c/Users/user") + "/.gemini/antigravity"))
 AGY_DB = AGY_BASE / "conversation_summaries.db"
 AGY_ANNOTATIONS = AGY_BASE / "annotations"
 AGY_PRESENCE = AGY_BASE / "presence"

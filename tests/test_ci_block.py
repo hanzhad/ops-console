@@ -21,7 +21,7 @@ import subprocess
 import sys
 import unittest
 
-ROOT = pathlib.Path(__file__).resolve().parent
+ROOT = pathlib.Path(__file__).resolve().parents[1]
 BIN = ROOT / "bin"
 
 
@@ -263,8 +263,8 @@ class TestCiStatusJsonAndMega(unittest.TestCase):
 
     def test_regate_uses_redeploy_and_pin_vault(self):
         src = text("regate.sh")
-        self.assertIn("tools/ci-runner/ci-runner.sh redeploy --yes", src)
-        self.assertIn("secret-vault unlock", src)
+        self.assertIn("ci-runner.sh redeploy --yes", src)
+        self.assertIn("pin-vault unlock", src)
 
     def test_parse_ci_status_json_parses_queue_non_local_queued_and_rate_limit(self):
         import json

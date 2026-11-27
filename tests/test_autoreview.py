@@ -13,7 +13,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-BIN_DIR = pathlib.Path(__file__).resolve().parent / "bin"
+BIN_DIR = pathlib.Path(__file__).resolve().parents[1] / "bin"
 if str(BIN_DIR) not in sys.path:
     sys.path.insert(0, str(BIN_DIR))
 
@@ -221,7 +221,7 @@ class TestModelsFromCli(unittest.TestCase):
 class TestPageSource(unittest.TestCase):
     """page.html has no browser test; these pin the source of the selects."""
 
-    root = pathlib.Path(__file__).resolve().parent
+    root = pathlib.Path(__file__).resolve().parents[1]
     page = "\n".join(f.read_text(encoding="utf-8") for f in [root / "page.html", *sorted((root / "static").glob("*.js"))])
 
     def test_no_hard_coded_lists(self):

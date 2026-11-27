@@ -7,8 +7,9 @@ import re
 import subprocess
 from typing import Any, Dict, List, Optional, Tuple
 
-DEFAULT_AGENTAPI_BIN = "/mnt/c/Users/user/AppData/Local/Programs/antigravity/resources/bin/language_server.exe"
-DEFAULT_AGENTAPI_BAT = "/mnt/c/Users/user/.gemini/antigravity/bin/agentapi.bat"
+_WIN_USER = os.environ.get("OPS_CONSOLE_WIN_HOME", "/mnt/c/Users/user")
+DEFAULT_AGENTAPI_BIN = os.environ.get("OPS_CONSOLE_AGENTAPI_BIN", f"{_WIN_USER}/AppData/Local/Programs/antigravity/resources/bin/language_server.exe")
+DEFAULT_AGENTAPI_BAT = os.environ.get("OPS_CONSOLE_AGENTAPI_BAT", f"{_WIN_USER}/.gemini/antigravity/bin/agentapi.bat")
 SEND_TIMEOUT = 30
 
 _BAT_QUOTED_EXE = re.compile(r'"([A-Za-z]:[\\/][^"\r\n]+?\.exe)"', re.IGNORECASE)

@@ -13,7 +13,7 @@ import projects
 
 VERBS = {"release": "evict {} --yes", "force": "evict {} --yes --force", "rescue": "evict {} --yes", "remove": "down {}"}
 STATE = pathlib.Path(os.environ.get("DEV_CONTAINER_HOME", pathlib.Path.home() / ".dev-containers"))
-THIN_ENGINE = pathlib.Path.home() / "Projects/host_repo/tools/dev-container-engine/scripts/dev-container-thin"
+THIN_ENGINE = pathlib.Path(os.environ.get("OPS_CONSOLE_ENGINE_THIN", pathlib.Path.home() / "Projects/agent-dev-slots/scripts/dev-container-thin"))
 
 
 def _read_lease(sid):

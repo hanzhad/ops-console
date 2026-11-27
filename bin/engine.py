@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Unified Dev-Container Engine Integration & Cleaner Operations.
 
-Manages integration with hanzhad/dev-container-engine (host_repo an earlier change, an earlier change, #36):
+Manages integration with hanzhad/agent-dev-slots:
 - Cleaner status discovery: fast = dev-container reap --all (15 min),
   slow = rescue_audit (is each bundle's work already on GitHub?)
 - Rescue archives discovery & metadata (~/.agent-slots/rescue/ & ~/.dev-containers/rescue/)
@@ -29,8 +29,9 @@ AGENT_SLOT_STATE = pathlib.Path(os.environ.get("AGENT_SLOT_STATE", HOME / ".agen
 DEV_CONTAINER_STATE = pathlib.Path(os.environ.get("DEV_CONTAINER_HOME", HOME / ".dev-containers"))
 
 # Engine binary location
-ENGINE_THIN = pathlib.Path("/home/user/Projects/host_repo/tools/dev-container-engine/scripts/dev-container-thin")
-ENGINE_BIN = ENGINE_THIN if ENGINE_THIN.exists() else pathlib.Path("/home/user/Projects/host_repo/tools/dev-container-engine/bin/dev-container")
+_ENG_DIR = pathlib.Path(os.environ.get("OPS_CONSOLE_ENGINE_DIR", pathlib.Path.home() / "Projects/agent-dev-slots"))
+ENGINE_THIN = pathlib.Path(os.environ.get("OPS_CONSOLE_ENGINE_THIN", _ENG_DIR / "scripts/dev-container-thin"))
+ENGINE_BIN = ENGINE_THIN if ENGINE_THIN.exists() else pathlib.Path(os.environ.get("OPS_CONSOLE_ENGINE_BIN", _ENG_DIR / "bin/dev-container"))
 
 SCHEDULE_INTERVALS = {
     "fast": int(os.environ.get("DEV_CONTAINER_SCHEDULE_FAST", 900)),
@@ -359,9 +360,8 @@ def _pick_git_repo(project: str = "", meta: Optional[Dict[str, Any]] = None) -> 
     proj_name = (meta.get("project") if isinstance(meta, dict) else None) or project
     if proj_name and _is_safe_path_segment(str(proj_name)):
         candidates.append(HOME / "Projects" / str(proj_name))
-        candidates.append(pathlib.Path(f"/home/user/Projects/{proj_name}"))
-    candidates.append(HOME / "Projects" / "host_repo")
-    candidates.append(pathlib.Path("/home/user/Projects/host_repo"))
+        candidates.append(HOME / "Projects" / proj_name)
+    candidates.append(_ENG_DIR)
     return next((str(r) for r in candidates if r.exists() and (r / ".git").exists()), str(HOME))
 
 

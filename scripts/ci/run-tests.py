@@ -12,11 +12,13 @@ import unittest
 
 
 def discover_root_test_files(root: pathlib.Path) -> list[pathlib.Path]:
-    """Return sorted root-level test_*.py paths without recursing."""
+    """Return sorted tests/test_*.py files (non-recursive)."""
+    tests_dir = root / "tests"
+    if not tests_dir.is_dir():
+        return []
     return sorted(
-        p
-        for p in root.iterdir()
-        if p.is_file() and p.name.startswith("test_") and p.name.endswith(".py")
+        p for p in tests_dir.iterdir()
+        if p.is_file() and p.name.startswith("test_") and p.suffix == ".py"
     )
 
 
@@ -39,12 +41,15 @@ def run_test_file(root: pathlib.Path, path: pathlib.Path, verbosity: int = 1) ->
     """Load and run a single root test_*.py file via unittest."""
     start = time.monotonic()
     loader = unittest.TestLoader()
+    tests_dir = str(path.parent)
+    if tests_dir not in sys.path:
+        sys.path.insert(0, tests_dir)
     suite = loader.loadTestsFromName(path.stem)
     runner = unittest.TextTestRunner(stream=sys.stdout, verbosity=verbosity)
     result = runner.run(suite)
     duration_s = round(max(0.0, time.monotonic() - start), 4)
     return {
-        "file": path.name,
+        "file": path.relative_to(root).as_posix(),
         "tests": result.testsRun,
         "failures": len(result.failures),
         "errors": len(result.errors),
